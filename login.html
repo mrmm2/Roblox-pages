@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход — Roblox</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            user-select: none;
+        }
+        body {
+            background: #0b0e1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #1a1e2f;
+            border-radius: 36px;
+            padding: 30px 25px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid #2a2f4a;
+            text-align: center;
+        }
+        .logo {
+            color: #f7d44a;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .sub {
+            color: #7a7fa0;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .balance {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background: #0f1326;
+            border-radius: 20px;
+            padding: 14px 12px;
+            margin-bottom: 20px;
+            border: 1px solid #282e4a;
+        }
+        .balance-item {
+            text-align: center;
+            flex: 1;
+        }
+        .balance-item .label {
+            font-size: 11px;
+            color: #7a7fa0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .balance-item .value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+        .value.robux {
+            color: #f7d44a;
+        }
+        .value.yana {
+            color: #5fcbff;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .login-form input {
+            background: #0f1326;
+            border: 1px solid #282e4a;
+            border-radius: 40px;
+            padding: 14px 18px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .login-form input:focus {
+            border-color: #f7d44a;
+        }
+        .login-form input::placeholder {
+            color: #5a5f7a;
+        }
+        .login-form button {
+            background: #f7d44a;
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #0b0e1a;
+        }
+        .login-form button:hover {
+            background: #e6c23a;
+            transform: scale(1.01);
+        }
+        .login-form button:active {
+            transform: scale(0.97);
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 14px;
+            color: #7a7fa0;
+            margin-bottom: 18px;
+        }
+        .links a {
+            color: #5fcbff;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .links a:hover {
+            color: #f7d44a;
+            text-decoration: underline;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .menu a {
+            background: #0f1326;
+            border: 1px solid #282e4a;
+            border-radius: 20px;
+            padding: 14px 18px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu a:hover {
+            background: #1e2340;
+            border-color: #f7d44a;
+        }
+        .menu a .tag {
+            color: #5fcbff;
+            font-size: 13px;
+            font-weight: 400;
+        }
+        .menu a .tag.gold {
+            color: #f7d44a;
+        }
+
+        .footer {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #3a3f5a;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1e3a;
+            border: 1px solid #5fcbff;
+            color: #fff;
+            padding: 10px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            opacity: 0;
+            transition: 0.4s;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">🪙 ROBLOX</div>
+    <div class="sub">Войдите в свой аккаунт</div>
+
+    <div class="balance">
+        <div class="balance-item">
+            <div class="label">💰 Robux</div>
+            <div class="value robux" id="robuxDisplay">0</div>
+        </div>
+        <div class="balance-item">
+            <div class="label">🌟 Яны</div>
+            <div class="value yana" id="yanaDisplay">0</div>
+        </div>
+    </div>
+
+    <form class="login-form" id="loginForm">
+        <input type="text" id="username" placeholder="Имя пользователя / Email / Телефон" required>
+        <input type="password" id="password" placeholder="Пароль" required>
+        <button type="submit">🔐 Войти</button>
+    </form>
+
+    <div class="links">
+        <a href="#">Забыли пароль или имя пользователя?</a>
+        <a href="#">Отправить одноразовый код на email</a>
+        <a href="#" style="color:#f7d44a; font-weight:700;">Нет аккаунта? Зарегистрироваться</a>
+    </div>
+
+    <div class="menu">
+        <a href="index.html">🏠 Меню <span class="tag">index.html</span></a>
+        <a href="main.html">🏠 Главная <span class="tag">main.html</span></a>
+        <a href="creator.html">🛠️ Панель создателя <span class="tag">creator.html</span></a>
+        <a href="catalog.html">🛒 Каталог <span class="tag">catalog.html</span></a>
+        <a href="charts.html">📊 Топ игр <span class="tag">charts.html</span></a>
+        <a href="buy.html">💎 Купить Robux <span class="tag gold">за Яны</span></a>
+        <a href="clicker.html">🖱️ Кликер <span class="tag gold">играть</span></a>
+    </div>
+
+    <div class="footer">автосохранение</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // ==========================================
+    //  ЗАГРУЗКА БАЛАНСА
+    // ==========================================
+    let robux = parseInt(localStorage.getItem('robux')) || 0;
+    let yana = parseInt(localStorage.getItem('yana')) || 0;
+
+    function updateUI() {
+        document.getElementById('robuxDisplay').textContent = robux;
+        document.getElementById('yanaDisplay').textContent = yana;
+        localStorage.setItem('robux', robux);
+        localStorage.setItem('yana', yana);
+    }
+
+    function showToast(text) {
+        const toast = document.getElementById('toast');
+        toast.textContent = text;
+        toast.classList.add('show');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ==========================================
+    //  ВХОД
+    // ==========================================
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!username || !password) {
+            showToast('❌ Заполните все поля!');
+            return;
+        }
+
+        localStorage.setItem('roblox_username', username);
+        showToast(`✅ Добро пожаловать, ${username}!`);
+
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 600);
+    });
+
+    // ==========================================
+    //  ЗАПОМНИТЬ ИМЯ
+    // ==========================================
+    const savedUsername = localStorage.getItem('roblox_username');
+    if (savedUsername) {
+        document.getElementById('username').value = savedUsername;
+    }
+
+    // ==========================================
+    //  ОБНОВЛЕНИЕ БАЛАНСА
+    // ==========================================
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'robux') {
+            robux = parseInt(e.newValue) || 0;
+            document.getElementById('robuxDisplay').textContent = robux;
+        }
+        if (e.key === 'yana') {
+            yana = parseInt(e.newValue) || 0;
+            document.getElementById('yanaDisplay').textContent = yana;
+        }
+    });
+
+    updateUI();
+    console.log('🟢 Страница входа загружена!');
+</script>
+
+</body>
+</html>

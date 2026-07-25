@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Купить Robux за Яны</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Arial,sans-serif; }
+        body { background:#0b0e1a; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
+        .container { background:#1a1e2f; border-radius:36px; padding:30px; max-width:500px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.8); border:1px solid #2a2f4a; text-align:center; }
+        h1 { color:#f7d44a; font-size:28px; margin-bottom:8px; }
+        .sub { color:#7a7fa0; font-size:14px; margin-bottom:20px; }
+        .balance { display:flex; justify-content:center; gap:20px; background:#0f1326; border-radius:20px; padding:15px; margin-bottom:20px; border:1px solid #282e4a; }
+        .balance-item { text-align:center; }
+        .balance-item .label { font-size:12px; color:#7a7fa0; }
+        .balance-item .value { font-size:24px; font-weight:800; }
+        .value.robux { color:#f7d44a; }
+        .value.yana { color:#5fcbff; }
+        .pack { background:#0f1326; border:1px solid #282e4a; border-radius:20px; padding:15px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; }
+        .pack .info { text-align:left; }
+        .pack .info .name { font-weight:700; color:#fff; font-size:18px; }
+        .pack .info .desc { font-size:13px; color:#7a7fa0; }
+        .pack button { background:#f7d44a; border:none; padding:10px 20px; border-radius:40px; font-weight:700; font-size:16px; cursor:pointer; transition:0.2s; color:#0b0e1a; }
+        .pack button:disabled { background:#3a3f5e; color:#6a6f8a; cursor:not-allowed; }
+        .pack button:active:not(:disabled) { transform:scale(0.95); }
+        .pack button.yana-btn { background:#5fcbff; color:#0b0e1a; }
+        .menu a { display:inline-block; margin-top:16px; color:#5fcbff; text-decoration:none; font-weight:600; }
+        .menu a:hover { color:#f7d44a; }
+        .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#1a1e3a; border:1px solid #5fcbff; color:#fff; padding:10px 28px; border-radius:60px; font-weight:600; font-size:16px; box-shadow:0 8px 30px rgba(0,0,0,0.6); opacity:0; transition:0.4s; pointer-events:none; z-index:999; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>💎 Купить Robux</h1>
+    <div class="sub">За Яны — игровую валюту Яндекс Игр</div>
+
+    <div class="balance">
+        <div class="balance-item">
+            <div class="label">💰 Robux</div>
+            <div class="value robux" id="robuxDisplay">0</div>
+        </div>
+        <div class="balance-item">
+            <div class="label">🌟 Яны</div>
+            <div class="value yana" id="yanaDisplay">0</div>
+        </div>
+    </div>
+
+    <div id="packs">
+        <div class="pack">
+            <div class="info">
+                <div class="name">100 Robux</div>
+                <div class="desc">Стоимость: 5 Янов</div>
+            </div>
+            <button class="yana-btn" data-robux="100" data-price="5">Купить</button>
+        </div>
+        <div class="pack">
+            <div class="info">
+                <div class="name">500 Robux</div>
+                <div class="desc">Стоимость: 20 Янов</div>
+            </div>
+            <button class="yana-btn" data-robux="500" data-price="20">Купить</button>
+        </div>
+        <div class="pack">
+            <div class="info">
+                <div class="name">1000 Robux</div>
+                <div class="desc">Стоимость: 35 Янов</div>
+            </div>
+            <button class="yana-btn" data-robux="1000" data-price="35">Купить</button>
+        </div>
+        <div class="pack">
+            <div class="info">
+                <div class="name">5000 Robux</div>
+                <div class="desc">Стоимость: 150 Янов</div>
+            </div>
+            <button class="yana-btn" data-robux="5000" data-price="150">Купить</button>
+        </div>
+    </div>
+
+    <div class="menu">
+        <a href="index.html">🏠 На главную</a>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    let robux = parseInt(localStorage.getItem('robux')) || 0;
+    let yana = parseInt(localStorage.getItem('yana')) || 0;
+
+    function updateUI() {
+        document.getElementById('robuxDisplay').textContent = robux;
+        document.getElementById('yanaDisplay').textContent = yana;
+        localStorage.setItem('robux', robux);
+        localStorage.setItem('yana', yana);
+    }
+
+    function showToast(text) {
+        const toast = document.getElementById('toast');
+        toast.textContent = text;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    document.querySelectorAll('.pack button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const robuxAmount = parseInt(this.dataset.robux);
+            const price = parseInt(this.dataset.price);
+
+            if (yana < price) {
+                showToast('❌ Не хватает Янов! Пополни баланс.');
+                return;
+            }
+
+            yana -= price;
+            robux += robuxAmount;
+            updateUI();
+            showToast(`✅ +${robuxAmount} Robux! (Списано ${price} Янов)`);
+        });
+    });
+
+    updateUI();
+</script>
+</body>
+</html>

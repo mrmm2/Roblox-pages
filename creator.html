@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель создателя</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Arial,sans-serif; }
+        body { background:#0b0e1a; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
+        .container { background:#1a1e2f; border-radius:36px; padding:30px; max-width:500px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.8); border:1px solid #2a2f4a; text-align:center; }
+        h1 { color:#f7d44a; font-size:26px; margin-bottom:5px; }
+        .sub { color:#7a7fa0; font-size:13px; margin-bottom:18px; }
+        .balance { display:flex; justify-content:center; gap:20px; background:#0f1326; border-radius:20px; padding:12px; margin-bottom:18px; border:1px solid #282e4a; }
+        .balance-item { text-align:center; }
+        .balance-item .label { font-size:11px; color:#7a7fa0; }
+        .balance-item .value { font-size:22px; font-weight:800; }
+        .value.robux { color:#f7d44a; }
+        .value.yana { color:#5fcbff; }
+        .menu { display:flex; flex-direction:column; gap:10px; }
+        .menu a { background:#0f1326; border:1px solid #282e4a; border-radius:20px; padding:14px 18px; color:#fff; text-decoration:none; font-weight:600; transition:0.2s; display:flex; justify-content:space-between; align-items:center; }
+        .menu a:hover { background:#1e2340; border-color:#f7d44a; }
+        .menu a span { color:#7a7fa0; font-size:14px; font-weight:400; }
+        .menu a .price { color:#5fcbff; font-weight:700; }
+        .menu a .price.robux { color:#f7d44a; }
+        .footer { margin-top:16px; color:#3a3f5a; font-size:12px; }
+        .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#1a1e3a; border:1px solid #5fcbff; color:#fff; padding:10px 28px; border-radius:60px; font-weight:600; font-size:16px; box-shadow:0 8px 30px rgba(0,0,0,0.6); opacity:0; transition:0.4s; pointer-events:none; z-index:999; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🛠️ Панель создателя</h1>
+    <div class="sub">Создавай игры и управляй проектами</div>
+
+    <div class="balance">
+        <div class="balance-item">
+            <div class="label">💰 Robux</div>
+            <div class="value robux" id="robuxDisplay">0</div>
+        </div>
+        <div class="balance-item">
+            <div class="label">🌟 Яны</div>
+            <div class="value yana" id="yanaDisplay">0</div>
+        </div>
+    </div>
+
+    <div class="menu">
+        <a href="index.html">🏠 На главную <span>меню</span></a>
+        <a href="clicker.html">🖱️ Кликер <span>играть</span></a>
+        <a href="catalog.html">🛒 Каталог <span>покупки</span></a>
+        <a href="buy.html">💎 Купить Robux <span class="price">за Яны</span></a>
+        <a href="#" id="createGameBtn" style="border-color:#5fcbff;">🎮 Создать новую игру <span class="price">5 Янов</span></a>
+        <a href="#" id="upgradeStudioBtn">⬆️ Улучшить студию <span class="price robux">10 Robux</span></a>
+    </div>
+
+    <div class="footer">Версия 1.0</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    let robux = parseInt(localStorage.getItem('robux')) || 0;
+    let yana = parseInt(localStorage.getItem('yana')) || 0;
+
+    function updateUI() {
+        document.getElementById('robuxDisplay').textContent = robux;
+        document.getElementById('yanaDisplay').textContent = yana;
+        localStorage.setItem('robux', robux);
+        localStorage.setItem('yana', yana);
+    }
+
+    function showToast(text) {
+        const toast = document.getElementById('toast');
+        toast.textContent = text;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    document.getElementById('createGameBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (yana < 5) {
+            showToast('❌ Не хватает Янов! Купи Robux и обменяй.');
+            return;
+        }
+        yana -= 5;
+        updateUI();
+        showToast('🎮 Новая игра создана! (Списано 5 Янов)');
+    });
+
+    document.getElementById('upgradeStudioBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (robux < 10) {
+            showToast('❌ Не хватает Robux! Заработай в кликере.');
+            return;
+        }
+        robux -= 10;
+        updateUI();
+        showToast('⬆️ Студия улучшена! (Списано 10 Robux)');
+    });
+
+    updateUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Кликер — вывод Robux</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',Arial,sans-serif; user-select:none; }
+        body { background:#0b0e1a; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; }
+        .game { background:linear-gradient(145deg,#1a1e2f,#111524); border-radius:36px; padding:28px 22px; max-width:440px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.8); border:1px solid #2a2f4a; text-align:center; }
+        h1 { color:#f7d44a; font-size:26px; margin-bottom:8px; }
+        .balance { display:flex; justify-content:space-between; background:#0f1326; border-radius:20px; padding:12px; margin-bottom:18px; border:1px solid #282e4a; }
+        .balance-item { flex:1; text-align:center; }
+        .balance-item .label { font-size:12px; color:#7a7fa0; text-transform:uppercase; }
+        .balance-item .value { font-size:28px; font-weight:800; color:#f7d44a; }
+        .balance-item .value.clicks { color:#5fcbff; }
+        #clickBtn { width:140px; height:140px; border-radius:50%; border:none; background:radial-gradient(#f7d44a,#d4a020); font-size:48px; font-weight:900; cursor:pointer; box-shadow:0 10px 0 #8f6f1a; transition:0.08s; margin:6px auto 16px; display:block; line-height:1; }
+        #clickBtn:active { transform:translateY(6px); box-shadow:0 4px 0 #8f6f1a; }
+        .stats { display:flex; justify-content:space-between; font-size:15px; color:#a8adca; margin-bottom:14px; flex-wrap:wrap; gap:4px; }
+        .stats span { font-weight:700; color:#fff; }
+        .shop { background:#0f1326; border-radius:20px; padding:14px; border:1px solid #282e4a; }
+        .item { display:flex; justify-content:space-between; align-items:center; background:#161b33; border-radius:16px; padding:12px 16px; margin-bottom:10px; border:1px solid #262c48; }
+        .item:last-child { margin-bottom:0; }
+        .item .info { text-align:left; }
+        .item .info .name { font-weight:700; color:#fff; font-size:16px; }
+        .item .info .desc { font-size:12px; color:#7a7fa0; }
+        .item button { padding:8px 18px; border:none; border-radius:40px; font-weight:700; font-size:15px; cursor:pointer; transition:0.15s; background:#f7d44a; color:#0b0e1a; }
+        .item button:disabled { background:#3a3f5e; color:#6a6f8a; cursor:not-allowed; }
+        .item button:active:not(:disabled) { transform:scale(0.94); }
+        .item button.withdraw { background:#5fcbff; color:#0b0e1a; }
+        .reset-btn { margin-top:12px; width:100%; padding:12px; border:none; border-radius:40px; background:#2a2f50; color:#a8adca; font-weight:700; font-size:15px; cursor:pointer; transition:0.2s; }
+        .reset-btn:hover { background:#3a3f60; }
+        .home-btn { margin-top:8px; width:100%; padding:12px; border:none; border-radius:40px; background:#1e2340; color:#fff; font-weight:700; font-size:15px; cursor:pointer; transition:0.2s; }
+        .home-btn:hover { background:#2a2f50; }
+        .footer { margin-top:12px; font-size:11px; color:#3a3f5a; }
+        .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#1a1e3a; border:1px solid #5fcbff; color:#fff; padding:10px 28px; border-radius:60px; font-weight:600; font-size:16px; box-shadow:0 8px 30px rgba(0,0,0,0.6); opacity:0; transition:0.4s; pointer-events:none; z-index:999; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .float-text { position:fixed; font-size:24px; font-weight:900; color:#f7d44a; pointer-events:none; animation:floatUp 0.8s ease-out forwards; z-index:1000; }
+        @keyframes floatUp { 0%{opacity:1;transform:translateY(0) scale(1);} 100%{opacity:0;transform:translateY(-80px) scale(1.3);} }
+    </style>
+</head>
+<body>
+
+<div class="game">
+    <h1>🪙 КЛИКЕР</h1>
+
+    <div class="balance">
+        <div class="balance-item">
+            <div class="label">Монеты</div>
+            <div class="value" id="scoreDisplay">0</div>
+        </div>
+        <div class="balance-item">
+            <div class="label">Кликов</div>
+            <div class="value clicks" id="clicksDisplay">0</div>
+        </div>
+    </div>
+
+    <button id="clickBtn">👆</button>
+
+    <div class="stats">
+        <div>⚡ <span id="clickPower">1</span> за клик</div>
+        <div>🤖 <span id="autoPower">0</span>/сек</div>
+        <div>💰 <span id="earnedRobuxDisplay">0</span> Robux</div>
+    </div>
+
+    <div class="shop">
+        <div class="item">
+            <div class="info"><div class="name">💪 +1 клик</div><div class="desc">+1 монета за нажатие</div></div>
+            <button id="buyClick">20💰</button>
+        </div>
+        <div class="item">
+            <div class="info"><div class="name">🤖 +1 авто/сек</div><div class="desc">каждую секунду +1 монета</div></div>
+            <button id="buyAuto">50💰</button>
+        </div>
+        <div class="item">
+            <div class="info"><div class="name">🚀 +5 авто/сек</div><div class="desc">мощный апгрейд</div></div>
+            <button id="buyAuto5">200💰</button>
+        </div>
+        <div class="item" style="border-color: #5fcbff;">
+            <div class="info">
+                <div class="name">💳 Вывести Robux</div>
+                <div class="desc">Перевести на основной баланс</div>
+            </div>
+            <button id="withdrawBtn" class="withdraw">Вывести</button>
+        </div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn">🔄 Сбросить прогресс</button>
+    <button class="home-btn" id="homeBtn">🏠 На главную</button>
+    <div class="footer">автосохранение</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // ==========================================
+    //  СОСТОЯНИЕ
+    // ==========================================
+    let state = {
+        score: 0,
+        clicks: 0,
+        clickPower: 1,
+        autoPerSecond: 0,
+        earnedRobux: 0
+    };
+
+    let robux = parseInt(localStorage.getItem('robux')) || 0;
+    let yana = parseInt(localStorage.getItem('yana')) || 0;
+
+    // ==========================================
+    //  ЗАГРУЗКА
+    // ==========================================
+    function load() {
+        const raw = localStorage.getItem('clickerGame');
+        if (raw) {
+            try {
+                const d = JSON.parse(raw);
+                state.score = d.score ?? 0;
+                state.clicks = d.clicks ?? 0;
+                state.clickPower = d.clickPower ?? 1;
+                state.autoPerSecond = d.autoPerSecond ?? 0;
+                state.earnedRobux = d.earnedRobux ?? 0;
+            } catch(e) {}
+        }
+    }
+
+    // ==========================================
+    //  СОХРАНЕНИЕ
+    // ==========================================
+    function save() {
+        localStorage.setItem('clickerGame', JSON.stringify(state));
+        localStorage.setItem('robux', robux);
+        localStorage.setItem('yana', yana);
+    }
+
+    // ==========================================
+    //  DOM
+    // ==========================================
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const clicksDisplay = document.getElementById('clicksDisplay');
+    const clickPowerDisplay = document.getElementById('clickPower');
+    const autoPowerDisplay = document.getElementById('autoPower');
+    const earnedRobuxDisplay = document.getElementById('earnedRobuxDisplay');
+    const clickBtn = document.getElementById('clickBtn');
+
+    const buyClick = document.getElementById('buyClick');
+    const buyAuto = document.getElementById('buyAuto');
+    const buyAuto5 = document.getElementById('buyAuto5');
+    const withdrawBtn = document.getElementById('withdrawBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const homeBtn = document.getElementById('homeBtn');
+    const toast = document.getElementById('toast');
+
+    // ==========================================
+    //  TOAST
+    // ==========================================
+    let toastTimer = null;
+    function showToast(text) {
+        toast.textContent = text;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ==========================================
+    //  FLOAT-TEXT
+    // ==========================================
+    function showFloatText(x, y, text) {
+        const el = document.createElement('div');
+        el.className = 'float-text';
+        el.textContent = text;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 800);
+    }
+
+    // ==========================================
+    //  ОБНОВЛЕНИЕ UI
+    // ==========================================
+    function updateUI() {
+        scoreDisplay.textContent = Math.floor(state.score);
+        clicksDisplay.textContent = Math.floor(state.clicks);
+        clickPowerDisplay.textContent = state.clickPower;
+        autoPowerDisplay.textContent = state.autoPerSecond;
+        earnedRobuxDisplay.textContent = state.earnedRobux;
+
+        buyClick.disabled = state.score < 20;
+        buyAuto.disabled = state.score < 50;
+        buyAuto5.disabled = state.score < 200;
+        buyClick.textContent = `20💰`;
+        buyAuto.textContent = `50💰`;
+        buyAuto5.textContent = `200💰`;
+
+        withdrawBtn.disabled = state.earnedRobux < 1;
+
+        save();
+    }
+
+    // ==========================================
+    //  КЛИК
+    // ==========================================
+    function handleClick(e) {
+        state.score += state.clickPower;
+        state.clicks += 1;
+
+        // За каждые 100 кликов = 1 Robux
+        if (state.clicks % 100 === 0) {
+            state.earnedRobux += 1;
+            showToast(`💰 +1 Robux! Всего: ${state.earnedRobux}`);
+        }
+
+        if (e) {
+            const rect = clickBtn.getBoundingClientRect();
+            const x = rect.left + rect.width / 2 - 20;
+            const y = rect.top - 10;
+            showFloatText(x, y, `+${state.clickPower}`);
+        }
+
+        updateUI();
+    }
+
+    // ==========================================
+    //  ПОКУПКИ
+    // ==========================================
+    function buyClickPower() {
+        if (state.score < 20) return;
+        state.score -= 20;
+        state.clickPower += 1;
+        updateUI();
+        showToast('💪 +1 к силе клика');
+    }
+
+    function buyAutoUnit() {
+        if (state.score < 50) return;
+        state.score -= 50;
+        state.autoPerSecond += 1;
+        updateUI();
+        showToast('🤖 +1 авто/сек');
+    }
+
+    function buyAuto5Unit() {
+        if (state.score < 200) return;
+        state.score -= 200;
+        state.autoPerSecond += 5;
+        updateUI();
+        showToast('🚀 +5 авто/сек');
+    }
+
+    // ==========================================
+    //  ВЫВОД ROBUX (ГАРАНТИРОВАННО РАБОТАЕТ)
+    // ==========================================
+    function withdrawRobux() {
+        // Проверяем, есть ли что выводить
+        if (state.earnedRobux < 1) {
+            showToast('❌ Нет Robux для вывода! Накликай 100 раз.');
+            return;
+        }
+
+        // Запоминаем сумму для вывода
+        const amount = state.earnedRobux;
+
+        // Добавляем на основной баланс
+        robux += amount;
+
+        // Обнуляем заработанные Robux в кликере
+        state.earnedRobux = 0;
+
+        // Сохраняем всё
+        save();
+        updateUI();
+
+        // Показываем сообщение
+        showToast(`✅ Выведено ${amount} Robux на основной баланс!`);
+
+        // Для отладки — пишем в консоль
+        console.log(`Выведено ${amount} Robux. Теперь на балансе: ${robux}`);
+    }
+
+    // ==========================================
+    //  СБРОС
+    // ==========================================
+    function resetGame() {
+        if (!confirm('Сбросить прогресс в кликере?')) return;
+        state.score = 0;
+        state.clicks = 0;
+        state.clickPower = 1;
+        state.autoPerSecond = 0;
+        state.earnedRobux = 0;
+        updateUI();
+        showToast('🔄 Прогресс сброшен');
+    }
+
+    // ==========================================
+    //  АВТОКЛИК
+    // ==========================================
+    setInterval(() => {
+        if (state.autoPerSecond > 0) {
+            state.score += state.autoPerSecond;
+            // Автоматически начисляем Robux за автоклики
+            if (state.clicks > 0 && state.clicks % 100 === 0) {
+                state.earnedRobux += 1;
+                showToast(`💰 +1 Robux (авто)! Всего: ${state.earnedRobux}`);
+            }
+            updateUI();
+        }
+    }, 1000);
+
+    // ==========================================
+    //  ПРИВЯЗКА СОБЫТИЙ
+    // ==========================================
+    clickBtn.addEventListener('click', handleClick);
+
+    buyClick.addEventListener('click', buyClickPower);
+    buyAuto.addEventListener('click', buyAutoUnit);
+    buyAuto5.addEventListener('click', buyAuto5Unit);
+
+    // Главная кнопка вывода
+    withdrawBtn.addEventListener('click', withdrawRobux);
+
+    resetBtn.addEventListener('click', resetGame);
+    homeBtn.addEventListener('click', function() {
+        window.location.href = 'index.html';
+    });
+
+    // ==========================================
+    //  СТАРТ
+    // ==========================================
+    load();
+    updateUI();
+
+    console.log('🟢 Кликер загружен! Нажми на кнопку 👆');
+    console.log('💰 Robux на основном балансе:', robux);
+    console.log('💳 Заработано в кликере:', state.earnedRobux);
+</script>
+
+</body>
+</html>

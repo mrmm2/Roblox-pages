@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Админ-панель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        body {
+            background: #0b0e1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #1a1e2f;
+            border-radius: 36px;
+            padding: 30px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid #2a2f4a;
+            text-align: center;
+        }
+        h1 {
+            color: #f7d44a;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        .sub {
+            color: #7a7fa0;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .balance {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background: #0f1326;
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 20px;
+            border: 1px solid #282e4a;
+        }
+        .balance-item {
+            flex: 1;
+            text-align: center;
+        }
+        .balance-item .label {
+            font-size: 12px;
+            color: #7a7fa0;
+            text-transform: uppercase;
+        }
+        .balance-item .value {
+            font-size: 28px;
+            font-weight: 800;
+        }
+        .value.robux { color: #f7d44a; }
+        .value.yana { color: #5fcbff; }
+
+        .admin-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .admin-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #0f1326;
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid #282e4a;
+        }
+        .admin-row .label {
+            color: #7a7fa0;
+            font-weight: 600;
+            font-size: 14px;
+            flex: 1;
+            text-align: left;
+        }
+        .admin-row input {
+            background: #1a1e2f;
+            border: 1px solid #282e4a;
+            border-radius: 30px;
+            padding: 8px 14px;
+            color: #fff;
+            width: 70px;
+            text-align: center;
+            font-size: 16px;
+            outline: none;
+        }
+        .admin-row input:focus {
+            border-color: #f7d44a;
+        }
+        .admin-row button {
+            background: #f7d44a;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #0b0e1a;
+        }
+        .admin-row button:hover {
+            background: #e6c23a;
+        }
+        .admin-row button.yana-btn {
+            background: #5fcbff;
+            color: #0b0e1a;
+        }
+        .admin-row button.yana-btn:hover {
+            background: #4ab8f0;
+        }
+        .admin-row button.danger {
+            background: #e94560;
+            color: #fff;
+        }
+        .admin-row button.danger:hover {
+            background: #d43450;
+        }
+
+        .menu {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .menu a {
+            background: #0f1326;
+            border: 1px solid #282e4a;
+            border-radius: 20px;
+            padding: 12px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .menu a:hover {
+            background: #1e2340;
+            border-color: #f7d44a;
+        }
+
+        .footer {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #3a3f5a;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1e3a;
+            border: 1px solid #5fcbff;
+            color: #fff;
+            padding: 10px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            opacity: 0;
+            transition: 0.4s;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛠️ Админ-панель</h1>
+    <div class="sub">Управление балансом</div>
+
+    <div class="balance">
+        <div class="balance-item">
+            <div class="label">💰 Robux</div>
+            <div class="value robux" id="robuxDisplay">0</div>
+        </div>
+        <div class="balance-item">
+            <div class="label">🌟 Яны</div>
+            <div class="value yana" id="yanaDisplay">0</div>
+        </div>
+    </div>
+
+    <div class="admin-panel">
+        <!-- Robux -->
+        <div class="admin-row">
+            <span class="label">💰 Robux</span>
+            <input type="number" id="robuxInput" value="100" min="0" />
+            <button id="addRobuxBtn">+ Добавить</button>
+            <button id="removeRobuxBtn" class="danger">- Забрать</button>
+        </div>
+        <!-- Яны -->
+        <div class="admin-row">
+            <span class="label">🌟 Яны</span>
+            <input type="number" id="yanaInput" value="50" min="0" />
+            <button id="addYanaBtn" class="yana-btn">+ Добавить</button>
+            <button id="removeYanaBtn" class="danger">- Забрать</button>
+        </div>
+        <!-- Быстрые пресеты -->
+        <div class="admin-row" style="justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button id="preset1" style="background:#f7d44a; border:none; padding:6px 14px; border-radius:30px; font-weight:700; cursor:pointer;">+100 Robux</button>
+            <button id="preset2" style="background:#5fcbff; border:none; padding:6px 14px; border-radius:30px; font-weight:700; cursor:pointer;">+50 Янов</button>
+            <button id="preset3" style="background:#e94560; border:none; padding:6px 14px; border-radius:30px; font-weight:700; cursor:pointer; color:#fff;">Сбросить всё</button>
+        </div>
+    </div>
+
+    <div class="menu">
+        <a href="index.html">🏠 На главную</a>
+        <a href="clicker.html">🖱️ В кликер</a>
+    </div>
+
+    <div class="footer">Только для админа</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    // ==========================================
+    //  ЗАГРУЗКА БАЛАНСА
+    // ==========================================
+    let robux = parseInt(localStorage.getItem('robux')) || 0;
+    let yana = parseInt(localStorage.getItem('yana')) || 0;
+
+    function updateUI() {
+        document.getElementById('robuxDisplay').textContent = robux;
+        document.getElementById('yanaDisplay').textContent = yana;
+        localStorage.setItem('robux', robux);
+        localStorage.setItem('yana', yana);
+    }
+
+    function showToast(text) {
+        const toast = document.getElementById('toast');
+        toast.textContent = text;
+        toast.classList.add('show');
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ==========================================
+    //  ФУНКЦИИ
+    // ==========================================
+    function addRobux() {
+        const val = parseInt(document.getElementById('robuxInput').value) || 0;
+        if (val <= 0) { showToast('❌ Введите число больше 0'); return; }
+        robux += val;
+        updateUI();
+        showToast(`✅ Добавлено ${val} Robux`);
+    }
+
+    function removeRobux() {
+        const val = parseInt(document.getElementById('robuxInput').value) || 0;
+        if (val <= 0) { showToast('❌ Введите число больше 0'); return; }
+        if (robux < val) { showToast('❌ Недостаточно Robux'); return; }
+        robux -= val;
+        updateUI();
+        showToast(`✅ Забрано ${val} Robux`);
+    }
+
+    function addYana() {
+        const val = parseInt(document.getElementById('yanaInput').value) || 0;
+        if (val <= 0) { showToast('❌ Введите число больше 0'); return; }
+        yana += val;
+        updateUI();
+        showToast(`✅ Добавлено ${val} Янов`);
+    }
+
+    function removeYana() {
+        const val = parseInt(document.getElementById('yanaInput').value) || 0;
+        if (val <= 0) { showToast('❌ Введите число больше 0'); return; }
+        if (yana < val) { showToast('❌ Недостаточно Янов'); return; }
+        yana -= val;
+        updateUI();
+        showToast(`✅ Забрано ${val} Янов`);
+    }
+
+    function presetRobux100() {
+        robux += 100;
+        updateUI();
+        showToast('✅ +100 Robux');
+    }
+
+    function presetYana50() {
+        yana += 50;
+        updateUI();
+        showToast('✅ +50 Янов');
+    }
+
+    function resetAll() {
+        if (!confirm('Сбросить всё (Robux и Яны) в 0?')) return;
+        robux = 0;
+        yana = 0;
+        updateUI();
+        showToast('🔄 Всё сброшено в 0');
+    }
+
+    // ==========================================
+    //  ПРИВЯЗКА
+    // ==========================================
+    document.getElementById('addRobuxBtn').addEventListener('click', addRobux);
+    document.getElementById('removeRobuxBtn').addEventListener('click', removeRobux);
+    document.getElementById('addYanaBtn').addEventListener('click', addYana);
+    document.getElementById('removeYanaBtn').addEventListener('click', removeYana);
+
+    document.getElementById('preset1').addEventListener('click', presetRobux100);
+    document.getElementById('preset2').addEventListener('click', presetYana50);
+    document.getElementById('preset3').addEventListener('click', resetAll);
+
+    // ==========================================
+    //  СТАРТ
+    // ==========================================
+    updateUI();
+    console.log('🟢 Админ-панель загружена!');
+</script>
+
+</body>
+</html>

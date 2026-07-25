@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная — Roblox</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            user-select: none;
+        }
+        body {
+            background: #0b0e1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #1a1e2f;
+            border-radius: 36px;
+            padding: 30px 25px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            border: 1px solid #2a2f4a;
+            text-align: center;
+        }
+        .logo {
+            color: #f7d44a;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .sub {
+            color: #7a7fa0;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .balance {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background: #0f1326;
+            border-radius: 20px;
+            padding: 14px 12px;
+            margin-bottom: 20px;
+            border: 1px solid #282e4a;
+        }
+        .balance-item {
+            text-align: center;
+            flex: 1;
+        }
+        .balance-item .label {
+            font-size: 11px;
+            color: #7a7fa0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .balance-item .value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 2px;
+        }
+        .value.robux {
+            color: #f7d44a;
+        }
+        .value.yana {
+            color: #5fcbff;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .menu a {
+            background: #0f1326;
+            border: 1px solid #282e4a;
+            border-radius: 20px;
+            padding: 14px 18px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .menu a:hover {
+            background: #1e2340;
+            border-color: #f7d44a;
+        }
+        .menu a .tag {
+            color: #5fcbff;
+            font-size: 13px;
+            font-weight: 400;
+        }
+        .menu a .tag.gold {
+            color: #f7d44a;
+        }
+
+        .footer {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #3a3f5a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">🪙 ROBLOX</div>
+    <div class="sub">Главная страница</div>
+
+    <div class="balance">
+        <div class="balance-item">
+            <div class="label">💰 Robux</div>
+            <div class="value robux" id="robuxDisplay">0</div>
+        </div>
+        <div class="balance-item">
+            <div class="label">🌟 Яны</div>
+            <div class="value yana" id="yanaDisplay">0</div>
+        </div>
+    </div>
+
+    <div class="menu">
+        <a href="index.html">🏠 Меню <span class="tag">index.html</span></a>
+        <a href="login.html">🔐 Вход <span class="tag">login.html</span></a>
+        <a href="creator.html">🛠️ Панель создателя <span class="tag">creator.html</span></a>
+        <a href="catalog.html">🛒 Каталог <span class="tag">catalog.html</span></a>
+        <a href="charts.html">📊 Топ игр <span class="tag">charts.html</span></a>
+        <a href="buy.html">💎 Купить Robux <span class="tag gold">за Яны</span></a>
+        <a href="clicker.html">🖱️ Кликер <span class="tag gold">играть</span></a>
+    </div>
+
+    <div class="footer">автосохранение</div>
+</div>
+
+<script>
+    // ==========================================
+    //  ЗАГРУЗКА БАЛАНСА
+    // ==========================================
+    let robux = parseInt(localStorage.getItem('robux')) || 0;
+    let yana = parseInt(localStorage.getItem('yana')) || 0;
+
+    function updateUI() {
+        document.getElementById('robuxDisplay').textContent = robux;
+        document.getElementById('yanaDisplay').textContent = yana;
+        localStorage.setItem('robux', robux);
+        localStorage.setItem('yana', yana);
+    }
+
+    // ==========================================
+    //  ОБНОВЛЕНИЕ ПРИ ИЗМЕНЕНИИ В ДРУГИХ ВКЛАДКАХ
+    // ==========================================
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'robux') {
+            robux = parseInt(e.newValue) || 0;
+            document.getElementById('robuxDisplay').textContent = robux;
+        }
+        if (e.key === 'yana') {
+            yana = parseInt(e.newValue) || 0;
+            document.getElementById('yanaDisplay').textContent = yana;
+        }
+    });
+
+    updateUI();
+    console.log('🟢 Main.html загружен!');
+</script>
+
+</body>
+</html>
